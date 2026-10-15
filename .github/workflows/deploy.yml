@@ -65,6 +65,7 @@ jobs:
         uses: appleboy/ssh-action@v1
         env:
           IMAGE: ${{ needs.build_and_push.outputs.image }}
+          APP_PORT: ${{ vars.APP_PORT || '8001' }}
           GHCR_USERNAME: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -73,7 +74,7 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT || '22' }}
           fingerprint: ${{ secrets.SSH_FINGERPRINT }}
-          envs: IMAGE,GHCR_USERNAME,GHCR_TOKEN
+          envs: IMAGE,APP_PORT,GHCR_USERNAME,GHCR_TOKEN
           script: |
             set -eu
 
@@ -95,7 +96,7 @@ jobs:
             docker run -d \
               --name server-time-api \
               --restart unless-stopped \
-              -p 8000:8000 \
+              -p "0.0.0.0:${APP_PORT}:8000" \
               "$IMAGE"
 
             for attempt in 1 2 3 4 5 6 7 8 9 10; do
