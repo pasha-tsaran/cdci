@@ -10,6 +10,19 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m uvicorn main:app --reload
 ```
 
+## Запуск через Docker
+
+Из папки проекта выполните:
+
+```powershell
+docker build -t server-time-api .
+docker run --rm -p 8000:8000 server-time-api
+```
+
+API доступен по адресу http://127.0.0.1:8000/time,
+Swagger — http://127.0.0.1:8000/docs. Для остановки нажмите `Ctrl+C`.
+В контейнере используется его локальный часовой пояс (по умолчанию UTC).
+
 ## Запрос текущего времени
 
 Откройте http://127.0.0.1:8000/time или выполните:
