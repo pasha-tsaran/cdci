@@ -57,13 +57,16 @@ jobs:
     needs: build_and_push
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
     steps:
       - name: Pull and restart container
         uses: appleboy/ssh-action@v1
         env:
           IMAGE: ${{ needs.build_and_push.outputs.image }}
-          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          GHCR_USERNAME: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
