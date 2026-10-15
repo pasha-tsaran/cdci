@@ -65,7 +65,7 @@ jobs:
         uses: appleboy/ssh-action@v1
         env:
           IMAGE: ${{ needs.build_and_push.outputs.image }}
-          APP_PORT: ${{ vars.APP_PORT || '8001' }}
+          APP_PORT: ${{ vars.APP_PORT || '0' }}
           GHCR_USERNAME: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -98,6 +98,9 @@ jobs:
               --restart unless-stopped \
               -p "0.0.0.0:${APP_PORT}:8000" \
               "$IMAGE"
+
+            echo "Published API port:"
+            docker port server-time-api 8000/tcp
 
             for attempt in 1 2 3 4 5 6 7 8 9 10; do
               if docker exec server-time-api python -c \
