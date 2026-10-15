@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from time import time_ns
 
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
@@ -9,6 +10,11 @@ app = FastAPI(title="Server Time API", version="1.0.0")
 
 class TimeResponse(BaseModel):
     server_time: datetime
+
+
+class TimestampResponse(BaseModel):
+    timestamp: int
+    timestamp_ms: int
 
 
 class DateResponse(BaseModel):
@@ -32,6 +38,17 @@ async def get_server_time(response: Response) -> TimeResponse:
     """Return the current time in the server's local timezone."""
     response.headers["Cache-Control"] = "no-store"
     return TimeResponse(server_time=datetime.now().astimezone())
+
+
+@app.get("/timestamp", response_model=TimestampResponse)
+async def get_server_timestamp(response: Response) -> TimestampResponse:
+    """Return Unix time in seconds and milliseconds from the same clock reading."""
+    response.headers["Cache-Control"] = "no-store"
+    now_ns = time_ns()
+    return TimestampResponse(
+        timestamp=now_ns // 1_000_000_000,
+        timestamp_ms=now_ns // 1_000_000,
+    )
 
 
 @app.get("/date", response_model=DateResponse)
